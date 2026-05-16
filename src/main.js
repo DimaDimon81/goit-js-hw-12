@@ -15,6 +15,8 @@ import {
 const form = document.querySelector('.form');
 const loadMoreBtn = document.querySelector('.load-more');
 
+const PER_PAGE = 15;
+
 let currentQuery = '';
 let currentPage = 1;
 let totalHits = 0;
@@ -56,7 +58,16 @@ form.addEventListener('submit', async event => {
 
     createGallery(data.hits);
 
-    if (totalHits > 15) {
+    const totalPages = Math.ceil(totalHits / PER_PAGE);
+
+    if (currentPage >= totalPages) {
+      hideLoadMoreButton();
+
+      iziToast.info({
+        message: "We're sorry, but you've reached the end of search results.",
+        position: 'topRight',
+      });
+    } else {
       showLoadMoreButton();
     }
   } catch {
@@ -81,7 +92,7 @@ loadMoreBtn.addEventListener('click', async () => {
 
     createGallery(data.hits);
 
-    const totalPages = Math.ceil(totalHits / 15);
+    const totalPages = Math.ceil(totalHits / PER_PAGE);
 
     if (currentPage >= totalPages) {
       hideLoadMoreButton();
@@ -94,9 +105,7 @@ loadMoreBtn.addEventListener('click', async () => {
       showLoadMoreButton();
     }
 
-    const card = document
-      .querySelector('.gallery-item')
-      .getBoundingClientRect();
+    const card = document.querySelector('.gallery-item').getBoundingClientRect();
 
     window.scrollBy({
       top: card.height * 2,
